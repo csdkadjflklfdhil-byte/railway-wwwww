@@ -95,11 +95,15 @@ CMD /usr/sbin/sshd && \
     PROXY_DOMAIN=${RAILWAY_TCP_PROXY_DOMAIN:-$(hostname -I | awk '{print $1}')} && \
     PROXY_PORT=${RAILWAY_TCP_PROXY_PORT:-$PORT} && \
 
-    COUNTRY_CODE=$(curl -s ipinfo.io/country || echo "US") && \
-    COUNTRY_NAME=$(curl -s https://ipapi.co/country_name/ || echo "United States") && \
-    # تحويل كود الدولة إلى إيموجي حقيقي باستخدام Perl لضمان دعم الـ UTF-8
-    COUNTRY_FLAG=$(echo "$COUNTRY_CODE" | perl -pe 'use utf8; s/([A-Z])/chr(0x1F1E6 + ord($1) - ord("A"))/ge') && \
-    COUNTRY=$(printf "$COUNTRY_NAME $COUNTRY_FLAG") && \
+# جلب كود الدولة واسمها من مصدر موثوق وبدون قيود شديدة
+    COUNTRY_DATA=$(curl -s "http://ip-api.com/json/") && \
+    COUNTRY_CODE=$(echo "$COUNTRY_DATA" | sed -n 's/.*"countryCode":"\([^"]*\)".*/\1/p') && \
+    COUNTRY_NAME=$(echo "$COUNTRY_DATA" | sed -n 's/.*"country":"\([^"]*\)".*/\1/p') && \
+    
+    COUNTRY_FLAG=$(echo "$COUNTRY_CODE" | perl -MEncode -pe '$_=encode_utf8(join("",map{chr(0x1F1E6+ord($_)-65)}split//))') && \
+    
+    COUNTRY="${COUNTRY_NAME} ${COUNTRY_FLAG}" && \
+    if [ -z "$COUNTRY_NAME" ]; then COUNTRY="Unknown 🌍"; fi && \
 
     IP=$(getent hosts ${RAILWAY_TCP_PROXY_DOMAIN} | awk '{print $1}' | head -n 1) && \
     \
