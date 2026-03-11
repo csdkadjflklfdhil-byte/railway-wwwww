@@ -122,7 +122,7 @@ CMD /usr/sbin/sshd && \
             MSG="${MSG}🔌 <b>Port:</b> <code>${PROXY_PORT}</code>%0A" && \
             MSG="${MSG}👤 <b>User:</b> <code>${USER}</code>%0A" && \
             MSG="${MSG}🔑 <b>Pass:</b> <code>${PASS}</code>%0A" && \
-            MSG="${MSG}🎮 <b>Support: UDPGW/Game.Call</b>%0A" && \
+            MSG="${MSG}🎮 <b>Support: UDPGW/Game.Call%40</b>%0A" && \
             MSG="${MSG}<blockquote><b>========== Net Mod ==========</b></blockquote>%0A" && \
             MSG="${MSG}<code>ssh://${NETMOD}@${IP}:${PROXY_PORT}/#${COUNTRY}~${SSH_CREATE}</code>%0A" && \
             MSG="${MSG}<blockquote><b>========== HTTP Custom ==========</b></blockquote>%0A" && \
