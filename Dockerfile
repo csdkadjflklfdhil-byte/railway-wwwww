@@ -95,20 +95,21 @@ CMD /usr/sbin/sshd && \
     sleep 5 && \
     PROXY_DOMAIN=${RAILWAY_TCP_PROXY_DOMAIN:-$(hostname -I | awk '{print $1}')} && \
     PROXY_PORT=${RAILWAY_TCP_PROXY_PORT:-$PORT} && \
-    # Get Location and Network Data
+#-------------------------------------------------------------------#
     COUNTRY_DATA=$(curl -s "http://ip-api.com/json/") && \
     COUNTRY_CODE=$(echo "$COUNTRY_DATA" | sed -n 's/.*"countryCode":"\([^"]*\)".*/\1/p') && \
     COUNTRY_NAME=$(echo "$COUNTRY_DATA" | sed -n 's/.*"country":"\([^"]*\)".*/\1/p') && \
     COUNTRY_FLAG=$(python3 -c "import sys; print(''.join(chr(127397 + ord(c)) for c in '$COUNTRY_CODE'))") && \
     COUNTRY="${COUNTRY_NAME} ${COUNTRY_FLAG}" && \
+#-------------------------------------------------------------------#
     IP=$(getent hosts ${RAILWAY_TCP_PROXY_DOMAIN} | awk '{print $1}' | head -n 1) && \
-    # Prepare Variables for Terminal and Telegram
+#-------------------------------------------------------------------#
     SSH_CREATE=$(TZ="Africa/Cairo" date +"%Y-%m-%d ~ %I:%M%p") && \
     USER_NETMOD=$(printf '%s' "$USER" | sed 's/@/\&#37;40/g') && \
     PASS_NETMOD=$(printf '%s' "$PASS" | sed 's/@/\&#37;40/g') && \
     U_LINK=$(echo "$USER" | sed 's/@/%40/g') && \
     P_LINK=$(echo "$PASS" | sed 's/@/%40/g') && \
-
+#-------------------------------------------------------------------#
     NETMOD="${USER_NETMOD}:${PASS_NETMOD}" && \
     \
     # Print to Terminal (Sync with Telegram Message)
