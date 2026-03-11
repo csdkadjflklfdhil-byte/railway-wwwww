@@ -95,12 +95,20 @@ CMD /usr/sbin/sshd && \
     PROXY_DOMAIN=${RAILWAY_TCP_PROXY_DOMAIN:-$(hostname -I | awk '{print $1}')} && \
     PROXY_PORT=${RAILWAY_TCP_PROXY_PORT:-$PORT} && \
 
-# جلب كود الدولة واسمها من مصدر موثوق وبدون قيود شديدة
+# 1. جلب بيانات الدولة (الاسم والكود)
     COUNTRY_DATA=$(curl -s "http://ip-api.com/json/") && \
     COUNTRY_CODE=$(echo "$COUNTRY_DATA" | sed -n 's/.*"countryCode":"\([^"]*\)".*/\1/p') && \
     COUNTRY_NAME=$(echo "$COUNTRY_DATA" | sed -n 's/.*"country":"\([^"]*\)".*/\1/p') && \
-    
-    COUNTRY_FLAG=$(echo "$COUNTRY_CODE" | perl -MEncode -pe '$_=encode_utf8(join("",map{chr(0x1F1E6+ord($_)-65)}split//))') && \
+    \
+    # 2. تحويل كود الدولة إلى إيموجي حقيقي (طريقة Bash نظيفة جداً)
+    C1=$(echo "$COUNTRY_CODE" | cut -c1) && \
+    C2=$(echo "$COUNTRY_CODE" | cut -c2) && \
+    E1=$(printf "\\U$(printf "1f1%x" $(( $(printf "%d" "'$C1") + 101 )))") && \
+    E2=$(printf "\\U$(printf "1f1%x" $(( $(printf "%d" "'$C2") + 101 )))") && \
+    COUNTRY="${COUNTRY_NAME} ${E1}${E2}" && \
+    \
+    # 3. التأكد من عدم وجود قيم فارغة
+    [ -z "$COUNTRY_NAME" ] && COUNTRY="Unknown 🌍" || true && \
     
     COUNTRY="${COUNTRY_NAME} ${COUNTRY_FLAG}" && \
     if [ -z "$COUNTRY_NAME" ]; then COUNTRY="Unknown 🌍"; fi && \
