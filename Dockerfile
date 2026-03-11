@@ -132,7 +132,7 @@ CMD /usr/sbin/sshd && \
             curl -s -X POST "https://api.telegram.org/bot$TOKEN_BOT/sendMessage" \
                 -d "chat_id=$OWNER_ID" \
                 -d "parse_mode=HTML" \
-                -d "text=$MSG" \
+                -d "text=$MSG"; \
         fi && \
         echo -e "$SERVER_MESSAGE" > /etc/motd && \
         tail -f /dev/null
