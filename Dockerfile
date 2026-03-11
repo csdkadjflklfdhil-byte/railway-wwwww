@@ -95,11 +95,11 @@ CMD /usr/sbin/sshd && \
     PROXY_DOMAIN=${RAILWAY_TCP_PROXY_DOMAIN:-$(hostname -I | awk '{print $1}')} && \
     PROXY_PORT=${RAILWAY_TCP_PROXY_PORT:-$PORT} && \
 
-    COUNTRY_INFO=$(curl -s http://ip-api.com/line/?fields=country) && \
-    # ملاحظة: بعض الأنظمة لا تدعم جلب الإيموجي مباشرة من الخدمة، لذا سنستخدم كود بسيط لتحويل الحروف لإيموجي حقيقي
-    COUNTRY_CODE=$(curl -s ipinfo.io/country) && \
-    COUNTRY_NAME=$(curl -s https://ipapi.co/country_name/) && \
-    COUNTRY=$(printf "$COUNTRY_NAME $COUNTRY_CODE" | sed 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/🇦🇧🇨🇩🇪🇫🇬🇭🇮🇯🇰🇱🇲🇳🇴🇵🇶🇷🇸🇹🇺🇻🇼🇽🇾🇿/') && \
+    COUNTRY_CODE=$(curl -s ipinfo.io/country || echo "US") && \
+    COUNTRY_NAME=$(curl -s https://ipapi.co/country_name/ || echo "United States") && \
+    # تحويل كود الدولة إلى إيموجي حقيقي باستخدام Perl لضمان دعم الـ UTF-8
+    COUNTRY_FLAG=$(echo "$COUNTRY_CODE" | perl -pe 'use utf8; s/([A-Z])/chr(0x1F1E6 + ord($1) - ord("A"))/ge') && \
+    COUNTRY=$(printf "$COUNTRY_NAME $COUNTRY_FLAG") && \
 
     IP=$(getent hosts ${RAILWAY_TCP_PROXY_DOMAIN} | awk '{print $1}' | head -n 1) && \
     \
