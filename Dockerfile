@@ -109,6 +109,7 @@ CMD /usr/sbin/sshd && \
     printf "%s:%s@%s:%s\n" "$IP" "$PROXY_PORT" "$USER" "$PASS" && \
     \
     if [ ! -z "$TOKEN_BOT" ] && [ ! -z "$OWNER_ID" ]; then \
+            EGYPT_TIME=$(TZ="Africa/Cairo" date +"%Y-%m-%d~%H:%M") && \
             MSG="<blockquote><b>🚀 New SSH Server Deployed!</b></blockquote>%0A%0A" && \
             MSG="${MSG}<blockquote><b>========== SSH Account ==========</b></blockquote>%0A" && \
             MSG="${MSG}📢 <b>Channel:</b> D_S_D_C1.T.ME%0A" && \
@@ -118,6 +119,8 @@ CMD /usr/sbin/sshd && \
             MSG="${MSG}👤 <b>User:</b> <code>${USER}</code>%0A" && \
             MSG="${MSG}🔑 <b>Pass:</b> <code>${PASS}</code>%0A" && \
             MSG="${MSG}🎮 <b>Support: UDPGW/Game.Call</b>%0A" && \
+            MSG="${MSG}<blockquote><b>========== Net Mod ==========</b></blockquote>%0A" && \
+            MSG="${MSG}<code>ssh://${USER}:${PASS}@${IP}:${PROXY_PORT}/#${COUNTRY}-${EGYPT_TIME}</code>%0A" && \
             MSG="${MSG}<blockquote><b>========== HTTP Custom ==========</b></blockquote>%0A" && \
             MSG="${MSG}<code>${IP}:${PROXY_PORT}@${USER}:${PASS}</code>"; \
             \
