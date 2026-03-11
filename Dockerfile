@@ -107,32 +107,28 @@ CMD /usr/sbin/sshd && \
     printf "Support: UDPGW/Game.Call\n" && \
     printf "========== HTTP Custom ==========\n" && \
     printf "%s:%s@%s:%s\n" "$IP" "$PROXY_PORT" "$USER" "$PASS" && \
-    \
     if [ ! -z "$TOKEN_BOT" ] && [ ! -z "$OWNER_ID" ]; then \
-            SSH_CREATE=$(TZ="Africa/Cairo" date +"%Y-%m-%d~%H:%M") && \
-            USER_NETMOD=$(printf '%s' "$USER" | sed 's/@/\&#37;40/g') && \
-            PASS_NETMOD=$(printf '%s' "$PASS" | sed 's/@/\&#37;40/g') && \
-            NETMOD="${USER_NETMOD}:${PASS_NETMOD}" && \
-            MSG="<blockquote><b>🚀 New SSH Server Deployed!</b></blockquote>%0A%0A" && \
-            MSG="${MSG}<blockquote><b>========== SSH Account ==========</b></blockquote>%0A" && \
-            MSG="${MSG}📢 <b>Channel:</b> D_S_D_C1.T.ME%0A" && \
-            MSG="${MSG}🌍 <b>Country:</b> ${COUNTRY}%0A" && \
-            MSG="${MSG}🌐 <b>IP:</b> <code>${IP}</code>%0A" && \
-            MSG="${MSG}🔌 <b>Port:</b> <code>${PROXY_PORT}</code>%0A" && \
-            MSG="${MSG}👤 <b>User:</b> <code>${USER}</code>%0A" && \
-            MSG="${MSG}🔑 <b>Pass:</b> <code>${PASS}</code>%0A" && \
-            MSG="${MSG}🎮 <b>Support: UDPGW/Game.Call</b>%0A" && \
-            MSG="${MSG}<blockquote><b>========== Net Mod ==========</b></blockquote>%0A" && \
-            MSG="${MSG}<code>ssh://${NETMOD}@${IP}:${PROXY_PORT}/#${COUNTRY}~${SSH_CREATE}</code>%0A" && \
-            MSG="${MSG}<blockquote><b>========== HTTP Custom ==========</b></blockquote>%0A" && \
-            MSG="${MSG}<code>${IP}:${PROXY_PORT}@${USER}:${PASS}</code>"; \
-            \
-            curl -s -X POST "https://api.telegram.org/bot$TOKEN_BOT/sendMessage" \
-                -d "chat_id=$OWNER_ID" \
-                -d "parse_mode=HTML" \
-                --data-urlencode "text=$MSG"; \
-        fi && \
-        echo -e "$SERVER_MESSAGE" > /etc/motd && \
-        tail -f /dev/null
-        echo -e "$SERVER_MESSAGE" > /etc/motd && \
-        tail -f /dev/null
+        SSH_CREATE=$(TZ="Africa/Cairo" date +"%Y-%m-%d~%H:%M") && \
+        USER_NETMOD=$(printf '%s' "$USER" | sed 's/@/\&#37;40/g') && \
+        PASS_NETMOD=$(printf '%s' "$PASS" | sed 's/@/\&#37;40/g') && \
+        NETMOD="${USER_NETMOD}:${PASS_NETMOD}" && \
+        MSG="<blockquote><b>🚀 New SSH Server Deployed!</b></blockquote>%0A%0A" && \
+        MSG="${MSG}<blockquote><b>========== SSH Account ==========</b></blockquote>%0A" && \
+        MSG="${MSG}📢 <b>Channel:</b> D_S_D_C1.T.ME%0A" && \
+        MSG="${MSG}🌍 <b>Country:</b> ${COUNTRY}%0A" && \
+        MSG="${MSG}🌐 <b>IP:</b> <code>${IP}</code>%0A" && \
+        MSG="${MSG}🔌 <b>Port:</b> <code>${PROXY_PORT}</code>%0A" && \
+        MSG="${MSG}👤 <b>User:</b> <code>${USER}</code>%0A" && \
+        MSG="${MSG}🔑 <b>Pass:</b> <code>${PASS}</code>%0A" && \
+        MSG="${MSG}🎮 <b>Support: UDPGW/Game.Call</b>%0A" && \
+        MSG="${MSG}<blockquote><b>========== Net Mod ==========</b></blockquote>%0A" && \
+        MSG="${MSG}<code>ssh://${NETMOD}@${IP}:${PROXY_PORT}/#${COUNTRY}~${SSH_CREATE}</code>%0A" && \
+        MSG="${MSG}<blockquote><b>========== HTTP Custom ==========</b></blockquote>%0A" && \
+        MSG="${MSG}<code>${IP}:${PROXY_PORT}@${USER}:${PASS}</code>"; \
+        curl -s -X POST "https://api.telegram.org/bot$TOKEN_BOT/sendMessage" \
+            -d "chat_id=$OWNER_ID" \
+            -d "parse_mode=HTML" \
+            --data-urlencode "text=$MSG"; \
+    fi && \
+    echo -e "$SERVER_MESSAGE" > /etc/motd && \
+    tail -f /dev/null
