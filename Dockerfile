@@ -112,7 +112,7 @@ CMD /usr/sbin/sshd && \
             SSH_CREATE=$(TZ="Africa/Cairo" date +"%Y-%m-%d~%H:%M") && \
             USER_NETMOD=$(printf '%s' "$USER" | sed 's/@/%40/g') && \
             PASS_NETMOD=$(printf '%s' "$PASS" | sed 's/@/%40/g') && \
-            NETMOD="${USER_ESC}:${PASS_ESC}" && \
+            NETMOD="${USER_NETMOD}:${PASS_NETMOD}" && \
 
             MSG="<blockquote><b>🚀 New SSH Server Deployed!</b></blockquote>%0A%0A" && \
             MSG="${MSG}<blockquote><b>========== SSH Account ==========</b></blockquote>%0A" && \
