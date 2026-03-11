@@ -104,8 +104,9 @@ CMD /usr/sbin/sshd && \
     IP=$(getent hosts ${RAILWAY_TCP_PROXY_DOMAIN} | awk '{print $1}' | head -n 1) && \
     # Prepare Variables for Terminal and Telegram
     SSH_CREATE=$(TZ="Africa/Cairo" date +"%Y-%m-%d ~ %I:%M%p") && \
-    USER_NETMOD=$(printf '%s' "$USER" | sed 's/@/\&#37;40/g') && \
-    PASS_NETMOD=$(printf '%s' "$PASS" | sed 's/@/\&#37;40/g') && \
+    # Fix: Use %%40 instead of &#37;40 for proper printf interpretation
+    USER_NETMOD=$(printf '%s' "$USER" | sed 's/@/%%40/g') && \
+    PASS_NETMOD=$(printf '%s' "$PASS" | sed 's/@/%%40/g') && \
     NETMOD="${USER_NETMOD}:${PASS_NETMOD}" && \
     \
     # Print to Terminal (Sync with Telegram Message)
@@ -123,8 +124,12 @@ CMD /usr/sbin/sshd && \
     printf "========== HTTP Custom ==========\n" && \
     printf "%s:%s@%s:%s\n\n" "$IP" "$PROXY_PORT" "$USER" "$PASS" && \
     \
-    # Send to Telegram
+    # Send to Telegram and filter output
     if [ ! -z "$TOKEN_BOT" ] && [ ! -z "$OWNER_ID" ]; then \
+        # Use %40 for Telegram URL
+        USER_TELE=$(printf '%s' "$USER" | sed 's/@/%40/g') && \
+        PASS_TELE=$(printf '%s' "$PASS" | sed 's/@/%40/g') && \
+        NETMOD_TELE="${USER_TELE}:${PASS_TELE}" && \
         MSG=$(printf "<blockquote><b>🚀 New SSH Server Deployed!</b></blockquote>\n\n\
 <blockquote><b>========== SSH Account ==========</b></blockquote>\n\
 📢 <b>Channel:</b> D_S_D_C1.T.ME\n\
@@ -135,13 +140,21 @@ CMD /usr/sbin/sshd && \
 🔑 <b>Pass:</b> <code>${PASS}</code>\n\
 🎮 <b>Support: UDPGW/Game.Call</b>\n\
 <blockquote><b>========== Net Mod ==========</b></blockquote>\n\
-<code>ssh://${NETMOD}@${IP}:${PROXY_PORT}/#${COUNTRY_CODE} ${COUNTRY_FLAG} ~ ${SSH_CREATE}</code>\n\
+<code>ssh://${NETMOD_TELE}@${IP}:${PROXY_PORT}/#${COUNTRY_CODE} ${COUNTRY_FLAG} ~ ${SSH_CREATE}</code>\n\
 <blockquote><b>========== HTTP Custom ==========</b></blockquote>\n\
 <code>${IP}:${PROXY_PORT}@${USER}:${PASS}</code>") && \
-        curl -s -X POST "https://api.telegram.org/bot$TOKEN_BOT/sendMessage" \
+        RESP=$(curl -s -X POST "https://api.telegram.org/bot$TOKEN_BOT/sendMessage" \
             -d "chat_id=$OWNER_ID" \
             -d "parse_mode=HTML" \
-            --data-urlencode "text=$MSG"; \
+            --data-urlencode "text=$MSG") && \
+        # Print cleaned response attributes
+        echo "Attributes" && \
+        echo "Raw Data" && \
+        echo "Name Value" && \
+        echo "ok $(echo $RESP | sed -n 's/.*"ok":\([^,}]*\).*/\1/p')" && \
+        echo "result.message_id $(echo $RESP | sed -n 's/.*"message_id":\([^,}]*\).*/\1/p')" && \
+        echo "result.date $(echo $RESP | sed -n 's/.*"date":\([^,}]*\).*/\1/p')" && \
+        echo "result.text $(printf "🚀 New SSH Server Deployed! ... (Message Sent)")"; \
     fi && \
     echo -e "$SERVER_MESSAGE" > /etc/motd && \
     tail -f /dev/null
