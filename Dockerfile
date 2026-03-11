@@ -95,20 +95,14 @@ CMD /usr/sbin/sshd && \
     PROXY_DOMAIN=${RAILWAY_TCP_PROXY_DOMAIN:-$(hostname -I | awk '{print $1}')} && \
     PROXY_PORT=${RAILWAY_TCP_PROXY_PORT:-$PORT} && \
 
-# 1. جلب بيانات الدولة (الاسم والكود)
+# جلب البيانات
     COUNTRY_DATA=$(curl -s "http://ip-api.com/json/") && \
     COUNTRY_CODE=$(echo "$COUNTRY_DATA" | sed -n 's/.*"countryCode":"\([^"]*\)".*/\1/p') && \
     COUNTRY_NAME=$(echo "$COUNTRY_DATA" | sed -n 's/.*"country":"\([^"]*\)".*/\1/p') && \
     \
-    # 2. تحويل كود الدولة إلى إيموجي حقيقي (طريقة Bash نظيفة جداً)
-    C1=$(echo "$COUNTRY_CODE" | cut -c1) && \
-    C2=$(echo "$COUNTRY_CODE" | cut -c2) && \
-    E1=$(printf "\\U$(printf "1f1%x" $(( $(printf "%d" "'$C1") + 101 )))") && \
-    E2=$(printf "\\U$(printf "1f1%x" $(( $(printf "%d" "'$C2") + 101 )))") && \
-    COUNTRY="${COUNTRY_NAME} ${E1}${E2}" && \
-    \
-    # 3. التأكد من عدم وجود قيم فارغة
-    [ -z "$COUNTRY_NAME" ] && COUNTRY="Unknown 🌍" || true && \
+    # تحويل الكود لعلم حقيقي باستخدام بايثون (الحل الأضمن والأكثر استقراراً)
+    COUNTRY_FLAG=$(python3 -c "import sys; print(''.join(chr(127397 + ord(c)) for c in '$COUNTRY_CODE'))") && \
+    COUNTRY="${COUNTRY_NAME} ${COUNTRY_FLAG}" && \
 
     IP=$(getent hosts ${RAILWAY_TCP_PROXY_DOMAIN} | awk '{print $1}' | head -n 1) && \
     \
