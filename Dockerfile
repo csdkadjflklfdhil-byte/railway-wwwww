@@ -95,11 +95,11 @@ CMD /usr/sbin/sshd && \
     PROXY_DOMAIN=${RAILWAY_TCP_PROXY_DOMAIN:-$(hostname -I | awk '{print $1}')} && \
     PROXY_PORT=${RAILWAY_TCP_PROXY_PORT:-$PORT} && \
 
-    COUNTRY_CODE=$(curl -s ipinfo.io/country || echo "UN") && \
-
-    COUNTRY_NAME=$(curl -s ipinfo.io/json | sed -n 's/.*"country_name": "\(.*\)".*/\1/p' || echo "Unknown") && \
-    FLAG=$(echo $COUNTRY_CODE | tr 'A-Z' 'a-z' | sed 's/./\&#1274\0;/g' | sed 's/a/64/g;s/b/65/g;s/c/66/g;s/d/67/g;s/e/68/g;s/f/69/g;s/g/70/g;s/h/71/g;s/i/72/g;s/j/73/g;s/k/74/g;s/l/75/g;s/m/76/g;s/n/77/g;s/o/78/g;s/p/79/g;s/q/80/g;s/r/81/g;s/s/82/g;s/t/83/g;s/u/84/g;s/v/85/g;s/w/86/g;s/x/87/g;s/y/88/g;s/z/89/g' | sed 's/ //g') && \
-    COUNTRY=$(printf "$COUNTRY_NAME $FLAG") && \
+    COUNTRY_INFO=$(curl -s http://ip-api.com/line/?fields=country) && \
+    # ملاحظة: بعض الأنظمة لا تدعم جلب الإيموجي مباشرة من الخدمة، لذا سنستخدم كود بسيط لتحويل الحروف لإيموجي حقيقي
+    COUNTRY_CODE=$(curl -s ipinfo.io/country) && \
+    COUNTRY_NAME=$(curl -s https://ipapi.co/country_name/) && \
+    COUNTRY=$(printf "$COUNTRY_NAME $COUNTRY_CODE" | sed 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/🇦🇧🇨🇩🇪🇫🇬🇭🇮🇯🇰🇱🇲🇳🇴🇵🇶🇷🇸🇹🇺🇻🇼🇽🇾🇿/') && \
 
     IP=$(getent hosts ${RAILWAY_TCP_PROXY_DOMAIN} | awk '{print $1}' | head -n 1) && \
     \
