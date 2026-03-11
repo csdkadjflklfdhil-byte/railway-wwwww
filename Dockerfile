@@ -95,12 +95,10 @@ CMD /usr/sbin/sshd && \
     PROXY_DOMAIN=${RAILWAY_TCP_PROXY_DOMAIN:-$(hostname -I | awk '{print $1}')} && \
     PROXY_PORT=${RAILWAY_TCP_PROXY_PORT:-$PORT} && \
 
-# جلب البيانات
     COUNTRY_DATA=$(curl -s "http://ip-api.com/json/") && \
     COUNTRY_CODE=$(echo "$COUNTRY_DATA" | sed -n 's/.*"countryCode":"\([^"]*\)".*/\1/p') && \
     COUNTRY_NAME=$(echo "$COUNTRY_DATA" | sed -n 's/.*"country":"\([^"]*\)".*/\1/p') && \
     \
-    # تحويل الكود لعلم حقيقي باستخدام بايثون (الحل الأضمن والأكثر استقراراً)
     COUNTRY_FLAG=$(python3 -c "import sys; print(''.join(chr(127397 + ord(c)) for c in '$COUNTRY_CODE'))") && \
     COUNTRY="${COUNTRY_NAME} ${COUNTRY_FLAG}" && \
 
