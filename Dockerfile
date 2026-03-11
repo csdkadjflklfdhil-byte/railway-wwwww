@@ -111,9 +111,9 @@ CMD /usr/sbin/sshd && \
     if [ ! -z "$TOKEN_BOT" ] && [ ! -z "$OWNER_ID" ]; then \
             SSH_CREATE=$(TZ="Africa/Cairo" date +"%Y-%m-%d~%H:%M") && \
             # تحويل علامة @ إلى &#37;40 لمنع تليجرام من تحويلها لـ @
-            USER_NETMOD=$(printf '%s' "$USER" | sed 's/@/\&#37;40/g')\
-            PASS_NETMOD=$(printf '%s' "$PASS" | sed 's/@/\&#37;40/g')\
-            NETMOD="${USER_NETMOD}:${PASS_NETMOD}" \
+            USER_NETMOD=$(printf '%s' "$USER" | sed 's/@/\&#37;40/g') && \
+            PASS_NETMOD=$(printf '%s' "$PASS" | sed 's/@/\&#37;40/g') && \
+            NETMOD="${USER_NETMOD}:${PASS_NETMOD}" && \
 
             MSG="<blockquote><b>🚀 New SSH Server Deployed!</b></blockquote>%0A%0A" && \
             MSG="${MSG}<blockquote><b>========== SSH Account ==========</b></blockquote>%0A" && \
