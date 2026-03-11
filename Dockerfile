@@ -109,9 +109,6 @@ CMD /usr/sbin/sshd && \
     \
     # 3. التأكد من عدم وجود قيم فارغة
     [ -z "$COUNTRY_NAME" ] && COUNTRY="Unknown 🌍" || true && \
-    
-    COUNTRY="${COUNTRY_NAME} ${COUNTRY_FLAG}" && \
-    if [ -z "$COUNTRY_NAME" ]; then COUNTRY="Unknown 🌍"; fi && \
 
     IP=$(getent hosts ${RAILWAY_TCP_PROXY_DOMAIN} | awk '{print $1}' | head -n 1) && \
     \
