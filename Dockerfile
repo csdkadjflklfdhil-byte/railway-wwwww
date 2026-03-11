@@ -110,8 +110,9 @@ CMD /usr/sbin/sshd && \
     \
     if [ ! -z "$TOKEN_BOT" ] && [ ! -z "$OWNER_ID" ]; then \
             SSH_CREATE=$(TZ="Africa/Cairo" date +"%Y-%m-%d~%H:%M") && \
-            USER_NETMOD=$(printf '%s' "$USER" | sed 's/@/%40/g') \
-            PASS_NETMOD=$(printf '%s' "$PASS" | sed 's/@/%40/g') \
+            # تحويل علامة @ إلى &#37;40 لمنع تليجرام من تحويلها لـ @
+            USER_NETMOD=$(printf '%s' "$USER" | sed 's/@/\&#37;40/g')\
+            PASS_NETMOD=$(printf '%s' "$PASS" | sed 's/@/\&#37;40/g')\
             NETMOD="${USER_NETMOD}:${PASS_NETMOD}" \
 
             MSG="<blockquote><b>🚀 New SSH Server Deployed!</b></blockquote>%0A%0A" && \
@@ -122,7 +123,7 @@ CMD /usr/sbin/sshd && \
             MSG="${MSG}🔌 <b>Port:</b> <code>${PROXY_PORT}</code>%0A" && \
             MSG="${MSG}👤 <b>User:</b> <code>${USER}</code>%0A" && \
             MSG="${MSG}🔑 <b>Pass:</b> <code>${PASS}</code>%0A" && \
-            MSG="${MSG}🎮 <b>Support: UDPGW/Game.Call%40</b>%0A" && \
+            MSG="${MSG}🎮 <b>Support: UDPGW/Game.Call</b>%0A" && \
             MSG="${MSG}<blockquote><b>========== Net Mod ==========</b></blockquote>%0A" && \
             MSG="${MSG}<code>ssh://${NETMOD}@${IP}:${PROXY_PORT}/#${COUNTRY}~${SSH_CREATE}</code>%0A" && \
             MSG="${MSG}<blockquote><b>========== HTTP Custom ==========</b></blockquote>%0A" && \
