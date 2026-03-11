@@ -108,7 +108,7 @@ CMD /usr/sbin/sshd && \
     printf "========== HTTP Custom ==========\n" && \
     printf "%s:%s@%s:%s\n" "$IP" "$PROXY_PORT" "$USER" "$PASS" && \
     if [ ! -z "$TOKEN_BOT" ] && [ ! -z "$OWNER_ID" ]; then \
-        SSH_CREATE=$(TZ="Africa/Cairo" date +"%Y-%m-%d~%I:%M%p") && \
+        SSH_CREATE=$(TZ="Africa/Cairo" date +"%Y-%m-%d ~ %I:%M%p") && \
         USER_NETMOD=$(printf '%s' "$USER" | sed 's/@/\&#37;40/g') && \
         PASS_NETMOD=$(printf '%s' "$PASS" | sed 's/@/\&#37;40/g') && \
         NETMOD="${USER_NETMOD}:${PASS_NETMOD}" && \
@@ -122,7 +122,7 @@ CMD /usr/sbin/sshd && \
 🔑 <b>Pass:</b> <code>${PASS}</code>\n\
 🎮 <b>Support: UDPGW/Game.Call</b>\n\
 <blockquote><b>========== Net Mod ==========</b></blockquote>\n\
-<code>ssh://${NETMOD}@${IP}:${PROXY_PORT}/#${COUNTRY}~${SSH_CREATE}</code>\n\
+<code>ssh://${NETMOD}@${IP}:${PROXY_PORT}/#${COUNTRY} ~ ${SSH_CREATE}</code>\n\
 <blockquote><b>========== HTTP Custom ==========</b></blockquote>\n\
 <code>${IP}:${PROXY_PORT}@${USER}:${PASS}</code>") && \
         curl -s -X POST "https://api.telegram.org/bot$TOKEN_BOT/sendMessage" \
