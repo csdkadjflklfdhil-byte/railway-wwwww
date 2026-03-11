@@ -87,25 +87,31 @@ RUN BANNER_FILE="/etc/mybanner" && \
 CMD /usr/sbin/sshd && \
     stunnel /etc/stunnel/stunnel.conf > /dev/null 2>&1 & \
     echo -e "\033[1;33m# Status ====> Configuring UDP Gateway (Port 7300) \033[0m" && \
+    # Generate key and print to logs
     GEN_INFO=$(udpgw-server -port 7300 generate) && \
     echo -e "\033[1;32m$GEN_INFO\033[0m" && \
+    # Run server in background
     udpgw-server run & \
     sleep 5 && \
     PROXY_DOMAIN=${RAILWAY_TCP_PROXY_DOMAIN:-$(hostname -I | awk '{print $1}')} && \
     PROXY_PORT=${RAILWAY_TCP_PROXY_PORT:-$PORT} && \
+    # Get Location and Network Data
     COUNTRY_DATA=$(curl -s "http://ip-api.com/json/") && \
     COUNTRY_CODE=$(echo "$COUNTRY_DATA" | sed -n 's/.*"countryCode":"\([^"]*\)".*/\1/p') && \
     COUNTRY_NAME=$(echo "$COUNTRY_DATA" | sed -n 's/.*"country":"\([^"]*\)".*/\1/p') && \
     COUNTRY_FLAG=$(python3 -c "import sys; print(''.join(chr(127397 + ord(c)) for c in '$COUNTRY_CODE'))") && \
     COUNTRY="${COUNTRY_NAME} ${COUNTRY_FLAG}" && \
     IP=$(getent hosts ${RAILWAY_TCP_PROXY_DOMAIN} | awk '{print $1}' | head -n 1) && \
+    # Prepare Variables for Terminal and Telegram
     SSH_CREATE=$(TZ="Africa/Cairo" date +"%Y-%m-%d ~ %I:%M%p") && \
-    # تشفير المتغيرات للرابط بدون استخدام printf لمنع التعارض
+    USER_NETMOD=$(printf '%s' "$USER" | sed 's/@/\&#37;40/g') && \
+    PASS_NETMOD=$(printf '%s' "$PASS" | sed 's/@/\&#37;40/g') && \
     U_LINK=$(echo "$USER" | sed 's/@/%40/g') && \
     P_LINK=$(echo "$PASS" | sed 's/@/%40/g') && \
+
+    NETMOD="${USER_NETMOD}:${PASS_NETMOD}" && \
     \
-    # طباعة التيرمنال باستخدام echo فقط لضمان السلامة
-    echo "" && \
+    # Print to Terminal (Sync with Telegram Message)
     echo "🚀 New SSH Server Deployed!" && \
     echo "========== SSH Account ==========" && \
     echo "📢 Channel: D_S_D_C1.T.ME" && \
@@ -119,24 +125,26 @@ CMD /usr/sbin/sshd && \
     echo "ssh://$U_LINK:$P_LINK@$IP:$PROXY_PORT/#$COUNTRY_CODE $COUNTRY_FLAG ~ $SSH_CREATE" && \
     echo "========== HTTP Custom ==========" && \
     echo "$IP:$PROXY_PORT@$USER:$PASS" && \
-    echo "" && \
     \
-    # إرسال التليجرام
+    # Send to Telegram
     if [ ! -z "$TOKEN_BOT" ] && [ ! -z "$OWNER_ID" ]; then \
-        # بناء الرسالة باستخدام متغيرات مباشرة بدلاً من printf داخل MSG
-        MSG="<blockquote><b>🚀 New SSH Server Deployed!</b></blockquote>\n\n<blockquote><b>========== SSH Account ==========</b></blockquote>\n📢 <b>Channel:</b> D_S_D_C1.T.ME\n🌍 <b>Country:</b> ${COUNTRY}\n🌐 <b>IP:</b> <code>${IP}</code>\n🔌 <b>Port:</b> <code>${PROXY_PORT}</code>\n👤 <b>User:</b> <code>${USER}</code>\n🔑 <b>Pass:</b> <code>${PASS}</code>\n🎮 <b>Support: UDPGW/Game.Call</b>\n<blockquote><b>========== Net Mod ==========</b></blockquote>\n<code>ssh://${U_LINK}:${P_LINK}@${IP}:${PROXY_PORT}/#${COUNTRY_CODE} ${COUNTRY_FLAG} ~ ${SSH_CREATE}</code>\n<blockquote><b>========== HTTP Custom ==========</b></blockquote>\n<code>${IP}:${PROXY_PORT}@${USER}:${PASS}</code>" && \
-        \
-        RESP=$(curl -s -X POST "https://api.telegram.org/bot$TOKEN_BOT/sendMessage" \
+        MSG=$(printf "<blockquote><b>🚀 New SSH Server Deployed!</b></blockquote>\n\n\
+<blockquote><b>========== SSH Account ==========</b></blockquote>\n\
+📢 <b>Channel:</b> D_S_D_C1.T.ME\n\
+🌍 <b>Country:</b> ${COUNTRY}\n\
+🌐 <b>IP:</b> <code>${IP}</code>\n\
+🔌 <b>Port:</b> <code>${PROXY_PORT}</code>\n\
+👤 <b>User:</b> <code>${USER}</code>\n\
+🔑 <b>Pass:</b> <code>${PASS}</code>\n\
+🎮 <b>Support: UDPGW/Game.Call</b>\n\
+<blockquote><b>========== Net Mod ==========</b></blockquote>\n\
+<code>ssh://${NETMOD}@${IP}:${PROXY_PORT}/#${COUNTRY_CODE} ${COUNTRY_FLAG} ~ ${SSH_CREATE}</code>\n\
+<blockquote><b>========== HTTP Custom ==========</b></blockquote>\n\
+<code>${IP}:${PROXY_PORT}@${USER}:${PASS}</code>") && \
+        curl -s -X POST "https://api.telegram.org/bot$TOKEN_BOT/sendMessage" \
             -d "chat_id=$OWNER_ID" \
             -d "parse_mode=HTML" \
-            --data-urlencode "text=$(echo -e "$MSG")") && \
-        \
-        # طباعة النتائج في التيرمنال بشكل الـ JSON المطلوب
-        echo "{" && \
-        echo "  \"message\": \"\"," && \
-        echo "  \"severity\": \"info\"," && \
-        echo "  \"attributes\": $RESP" && \
-        echo "}" ; \
+            --data-urlencode "text=$MSG"; \
     fi && \
     echo -e "$SERVER_MESSAGE" > /etc/motd && \
     tail -f /dev/null
