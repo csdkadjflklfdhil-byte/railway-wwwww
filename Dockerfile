@@ -100,11 +100,11 @@ CMD /usr/sbin/sshd && \
     COUNTRY="${COUNTRY_NAME} ${COUNTRY_FLAG}" && \
     IP=$(getent hosts ${RAILWAY_TCP_PROXY_DOMAIN} | awk '{print $1}' | head -n 1) && \
     SSH_CREATE=$(TZ="Africa/Cairo" date +"%Y-%m-%d ~ %I:%M%p") && \
-    # معالجة اليوزر والباسورد للرابط
+    # تشفير المتغيرات للرابط بدون استخدام printf لمنع التعارض
     U_LINK=$(echo "$USER" | sed 's/@/%40/g') && \
     P_LINK=$(echo "$PASS" | sed 's/@/%40/g') && \
     \
-    # الطباعة في التيرمنال
+    # طباعة التيرمنال باستخدام echo فقط لضمان السلامة
     echo "" && \
     echo "🚀 New SSH Server Deployed!" && \
     echo "========== SSH Account ==========" && \
@@ -121,26 +121,17 @@ CMD /usr/sbin/sshd && \
     echo "$IP:$PROXY_PORT@$USER:$PASS" && \
     echo "" && \
     \
-    # الإرسال لتيليجرام وعرض النتائج كـ JSON مرتب
+    # إرسال التليجرام
     if [ ! -z "$TOKEN_BOT" ] && [ ! -z "$OWNER_ID" ]; then \
-        MSG=$(printf "<blockquote><b>🚀 New SSH Server Deployed!</b></blockquote>\n\n\
-<blockquote><b>========== SSH Account ==========</b></blockquote>\n\
-📢 <b>Channel:</b> D_S_D_C1.T.ME\n\
-🌍 <b>Country:</b> ${COUNTRY}\n\
-🌐 <b>IP:</b> <code>${IP}</code>\n\
-🔌 <b>Port:</b> <code>${PROXY_PORT}</code>\n\
-👤 <b>User:</b> <code>${USER}</code>\n\
-🔑 <b>Pass:</b> <code>${PASS}</code>\n\
-🎮 <b>Support: UDPGW/Game.Call</b>\n\
-<blockquote><b>========== Net Mod ==========</b></blockquote>\n\
-<code>ssh://${U_LINK}:${P_LINK}@${IP}:${PROXY_PORT}/#${COUNTRY_CODE} ${COUNTRY_FLAG} ~ ${SSH_CREATE}</code>\n\
-<blockquote><b>========== HTTP Custom ==========</b></blockquote>\n\
-<code>${IP}:${PROXY_PORT}@${USER}:${PASS}</code>") && \
+        # بناء الرسالة باستخدام متغيرات مباشرة بدلاً من printf داخل MSG
+        MSG="<blockquote><b>🚀 New SSH Server Deployed!</b></blockquote>\n\n<blockquote><b>========== SSH Account ==========</b></blockquote>\n📢 <b>Channel:</b> D_S_D_C1.T.ME\n🌍 <b>Country:</b> ${COUNTRY}\n🌐 <b>IP:</b> <code>${IP}</code>\n🔌 <b>Port:</b> <code>${PROXY_PORT}</code>\n👤 <b>User:</b> <code>${USER}</code>\n🔑 <b>Pass:</b> <code>${PASS}</code>\n🎮 <b>Support: UDPGW/Game.Call</b>\n<blockquote><b>========== Net Mod ==========</b></blockquote>\n<code>ssh://${U_LINK}:${P_LINK}@${IP}:${PROXY_PORT}/#${COUNTRY_CODE} ${COUNTRY_FLAG} ~ ${SSH_CREATE}</code>\n<blockquote><b>========== HTTP Custom ==========</b></blockquote>\n<code>${IP}:${PROXY_PORT}@${USER}:${PASS}</code>" && \
+        \
         RESP=$(curl -s -X POST "https://api.telegram.org/bot$TOKEN_BOT/sendMessage" \
             -d "chat_id=$OWNER_ID" \
             -d "parse_mode=HTML" \
-            --data-urlencode "text=$MSG") && \
-        # طباعة الـ JSON بشكل يحاكي طلبك تماماً
+            --data-urlencode "text=$(echo -e "$MSG")") && \
+        \
+        # طباعة النتائج في التيرمنال بشكل الـ JSON المطلوب
         echo "{" && \
         echo "  \"message\": \"\"," && \
         echo "  \"severity\": \"info\"," && \
